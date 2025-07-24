@@ -1,0 +1,30 @@
+server:
+  port: 5000
+  servlet:
+    context-path: /conta-aqui-service
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: never
+    include-exception: true
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/contaaqui_dev?useUnicode=true&characterEncoding=utf8&useSSL=false
+    username: root
+    password: root
+  application:
+    name: conta-aqui-service
+    admin:
+        enabled: false
+  main:
+    allow-bean-definition-overriding: true
+  output:
+    ansi:
+      enabled: ALWAYS
+  jpa:
+    open-in-view: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
