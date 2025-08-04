@@ -10,6 +10,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -47,20 +49,20 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<ErrorDetailsDTO> handleUnauthorizedExceptionException(UnauthorizedException exception,
+    public ResponseEntity<ErrorDetailsDTO> handleUnauthorizedException(UnauthorizedException exception,
                                                                                 WebRequest webRequest) {
         ErrorDetailsDTO errorDetails = new ErrorDetailsDTO(getTime(), HttpStatus.UNAUTHORIZED.value(), exception.getMessage(),
                 webRequest.getDescription(false));
         return new ResponseEntity<>(errorDetails, new HttpHeaders(), HttpStatus.UNAUTHORIZED);
     }
 
-//    @ExceptionHandler({InternalAuthenticationServiceException.class, BadCredentialsException.class})
-//    public ResponseEntity<ErrorDetailsDTO> handleForbiddenExceptionException(Exception exception,
-//                                                                             WebRequest webRequest) {
-//        ErrorDetailsDTO errorDetails = new ErrorDetailsDTO(getTime(), HttpStatus.FORBIDDEN.value(), exception.getMessage(),
-//                webRequest.getDescription(false));
-//        return new ResponseEntity<>(errorDetails, new HttpHeaders(), HttpStatus.FORBIDDEN);
-//    }
+    @ExceptionHandler({InternalAuthenticationServiceException.class, BadCredentialsException.class})
+    public ResponseEntity<ErrorDetailsDTO> handleForbiddenException(Exception exception,
+                                                                             WebRequest webRequest) {
+        ErrorDetailsDTO errorDetails = new ErrorDetailsDTO(getTime(), HttpStatus.FORBIDDEN.value(), exception.getMessage(),
+                webRequest.getDescription(false));
+        return new ResponseEntity<>(errorDetails, new HttpHeaders(), HttpStatus.FORBIDDEN);
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorDetailsDTO> handleExceptionException(Exception exception, WebRequest webRequest) {

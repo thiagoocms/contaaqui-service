@@ -7,6 +7,7 @@ import com.thiagoocms.contaaqui.mapper.UserMapper;
 import com.thiagoocms.contaaqui.contaaqui_core.repository.UserRepository;
 import com.thiagoocms.contaaqui.common.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -15,18 +16,21 @@ import java.util.Objects;
 public class UserValidation extends AbstractCrudValidation<User, Long> {
 
     private final UserMapper mapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserValidation(UserMapper mapper, UserRepository repository, MessageService messageService) {
+    public UserValidation(UserMapper mapper, UserRepository repository, MessageService messageService, PasswordEncoder passwordEncoder) {
         super(repository, messageService);
         setMessageNotFound("error.user.not.found");
         this.mapper = mapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     protected void checkOwnerFieldsToCreate(User entity) {
         entity.setId(null);
         entity.setDeleted(false);
+        entity.setPassword(passwordEncoder.encode(entity.getPassword()));
     }
 
     @Override
