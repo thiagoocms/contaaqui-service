@@ -5,13 +5,14 @@ import com.thiagoocms.contaaqui.contaaqui_core.dto.transaction.TransactionDTO;
 import com.thiagoocms.contaaqui.contaaqui_core.dto.user.UserDTO;
 import com.thiagoocms.contaaqui.service.TransactionService;
 import com.thiagoocms.contaaqui.service.UserService;
+import com.thiagoocms.contaaqui.constants.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/transactions")
-public class TransactionResource extends AbstractCrudResource<Long, TransactionDTO> {
+@RequestMapping(AppConstants.API + AppConstants.V1 + "/transactions")
+public class TransactionResource extends AbstractCrudResource<Long, TransactionDTO, TransactionDTO> {
 
     @Autowired
     protected TransactionResource(TransactionService service) {

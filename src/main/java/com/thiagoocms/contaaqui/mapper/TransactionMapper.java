@@ -18,6 +18,7 @@ public class TransactionMapper extends AbstractMapper<Transaction, TransactionDT
         target.setCategory(new Category(source.categoryId()));
         target.setWallet(new Wallet(source.walletId()));
         target.setType(source.type());
+        target.setDate(source.date());
         target.setDeleted(source.deleted());
         return target;
     }
@@ -28,9 +29,12 @@ public class TransactionMapper extends AbstractMapper<Transaction, TransactionDT
                 source.getId(),
                 source.getWallet().getId(),
                 source.getCategory().getId(),
+                source.getCategory().getName(),
                 source.getType(),
                 source.getAmount(),
-                source.isDeleted()
+                source.getDate(),
+                source.isDeleted(),
+                ""
         );
     }
 

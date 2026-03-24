@@ -25,15 +25,21 @@ public class TokenService {
         LocalDateTime now = LocalDateTime.now();
         long expiry = 2L;
 
-        JwtClaimsSet claims = JwtClaimsSet.builder()
+        var claims = JwtClaimsSet.builder()
                 .issuer("contaaqui-service")
                 .issuedAt(now.toInstant(ZoneOffset.of("-03:00")))
-                .expiresAt(now.plusMinutes(expiry).toInstant(ZoneOffset.of("-03:00")))
+                .expiresAt(now.plusHours(expiry).toInstant(ZoneOffset.of("-03:00")))
                 .subject(auth.getUsername())
-                .build();
+                .claim("userId", auth.getId())
+                .claim("profile", auth.getProfile());
+
+        if (auth.getWallet() != null) {
+            claims.claim("walletId", auth.getWallet().getId());
+        }
+
 
         return encoder.encode(
-                        JwtEncoderParameters.from(claims))
+                        JwtEncoderParameters.from(claims.build()))
                 .getTokenValue();
     }
 

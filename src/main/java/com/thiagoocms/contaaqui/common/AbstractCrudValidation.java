@@ -36,4 +36,7 @@ public abstract class AbstractCrudValidation<E, ID extends Serializable> {
     public void setMessageNotFound(String messageNotFound) {
         this.messageNotFound = messageNotFound;
     }
+
+    protected void checkValidationsExtras(E entity) {
+    }
 }

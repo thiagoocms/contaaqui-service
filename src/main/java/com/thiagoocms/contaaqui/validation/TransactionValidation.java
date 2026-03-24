@@ -8,6 +8,8 @@ import com.thiagoocms.contaaqui.contaaqui_core.repository.TransactionRepository;
 import com.thiagoocms.contaaqui.mapper.TransactionMapper;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Component
@@ -30,6 +32,9 @@ public class TransactionValidation extends AbstractCrudValidation<Transaction, L
     protected void checkOwnerFieldsToCreate(Transaction entity) {
         entity.setId(null);
         entity.setDeleted(false);
+        if (Objects.isNull(entity.getDate())) {
+            entity.setDate(LocalDateTime.now());
+        }
     }
 
     @Override

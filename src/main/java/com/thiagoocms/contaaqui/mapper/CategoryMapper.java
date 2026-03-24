@@ -15,7 +15,7 @@ public class CategoryMapper extends AbstractMapper<Category, CategoryDTO> {
         target.setId(source.id());
         target.setName(source.name());
         target.setDescription(source.description());
-        target.setDeleted(source.deleted());
+        target.setDeleted(!source.active());
         target.setUser(new User(source.userId()));
         return target;
     }
@@ -27,7 +27,7 @@ public class CategoryMapper extends AbstractMapper<Category, CategoryDTO> {
                 source.getUser() != null ?  source.getUser().getId() : null,
                 source.getName(),
                 source.getDescription(),
-                source.isDeleted()
+                !source.isDeleted()
         );
     }
 

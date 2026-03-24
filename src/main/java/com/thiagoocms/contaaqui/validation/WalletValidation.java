@@ -3,6 +3,7 @@ package com.thiagoocms.contaaqui.validation;
 import com.thiagoocms.contaaqui.common.AbstractCrudValidation;
 import com.thiagoocms.contaaqui.contaaqui_core.domain.wallet.Wallet;
 import com.thiagoocms.contaaqui.contaaqui_core.exception.BadRequestException;
+import com.thiagoocms.contaaqui.contaaqui_core.exception.ConflictException;
 import com.thiagoocms.contaaqui.mapper.WalletMapper;
 import com.thiagoocms.contaaqui.contaaqui_core.repository.WalletRepository;
 import com.thiagoocms.contaaqui.common.MessageService;
@@ -15,12 +16,14 @@ public class WalletValidation extends AbstractCrudValidation<Wallet, Long> {
 
     private final UserValidation userValidation;
     private final WalletMapper mapper;
+    private final WalletRepository walletRepository;
 
     public WalletValidation(WalletRepository repository, MessageService messageService, UserValidation userValidation, WalletMapper mapper) {
         super(repository, messageService);
         setMessageNotFound("error.wallet.not.found");
         this.userValidation = userValidation;
         this.mapper = mapper;
+        this.walletRepository = repository;
     }
 
     @Override
@@ -68,5 +71,15 @@ public class WalletValidation extends AbstractCrudValidation<Wallet, Long> {
         entity.setUser(user);
 
         return entity;
+    }
+
+    @Override
+    protected void checkValidationsExtras(Wallet entity) {
+        if(Objects.isNull(entity.getId())) {
+            var exist = walletRepository.existsByUserIdAndDeletedIsFalse(entity.getUser().getId());
+            if(exist) {
+                throw new ConflictException(messageService.getMessage("error.wallet.user.already.exist"));
+            }
+        }
     }
 }

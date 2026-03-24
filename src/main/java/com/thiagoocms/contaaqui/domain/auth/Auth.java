@@ -22,6 +22,7 @@ public class Auth extends User implements UserDetails {
         this.setEmail(user.getEmail());
         this.setProfile(user.getProfile());
         this.setDeleted(user.isDeleted());
+        this.setWallet(user.getWallet());
     }
 
     @Override

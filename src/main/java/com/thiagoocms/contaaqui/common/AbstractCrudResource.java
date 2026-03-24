@@ -7,18 +7,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 
-public abstract class AbstractCrudResource<ID extends Serializable, M> {
+public abstract class AbstractCrudResource<ID extends Serializable, M, F> {
 
-    protected final AbstractCrudService<?, ID, M> service;
+    protected final AbstractCrudService<?, ID, M, F> service;
 
-    protected AbstractCrudResource(AbstractCrudService<?, ID, M> service) {
+    protected AbstractCrudResource(AbstractCrudService<?, ID, M, F> service) {
         this.service = service;
     }
 
+//    @GetMapping
+//    public ResponseEntity<Page<M>> getAll(Pageable pageable) {
+//        var page = service.findAll(pageable);
+//        return ResponseEntity.ok(page);
+//    }
+
     @GetMapping
-    public ResponseEntity<Page<M>> getAll(Pageable pageable) {
-        var page = service.findAll(pageable);
+    public ResponseEntity<Page<M>> getAll(Pageable pageable, F filter) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        var page = service.findAll(pageable, filter);
         return ResponseEntity.ok(page);
     }
 

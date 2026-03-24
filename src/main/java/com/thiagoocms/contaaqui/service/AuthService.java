@@ -40,8 +40,9 @@ public class AuthService {
         }
         var auth = new UsernamePasswordAuthenticationToken(decrypt[0], decrypt[1]);
         Authentication authentication = manager.authenticate(auth);
-        String token = tokenService.generateToken((Auth) authentication.getPrincipal());
-        return new AuthenticatedDTO(token);
+        var principal = (Auth) authentication.getPrincipal();
+        String token = tokenService.generateToken(principal);
+        return new AuthenticatedDTO(token, principal.getId(), principal.getUsername());
     }
 
 }

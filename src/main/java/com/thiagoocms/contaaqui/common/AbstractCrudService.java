@@ -2,13 +2,15 @@ package com.thiagoocms.contaaqui.common;
 
 import com.thiagoocms.contaaqui.contaaqui_core.common.AbstractJpaRepository;
 import com.thiagoocms.contaaqui.contaaqui_core.exception.ResourceNotFoundException;
+import com.thiagoocms.contaaqui.contaaqui_core.search.AbstractsSpecification;
+import com.thiagoocms.contaaqui.contaaqui_core.search.SearchCriteriaUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
 
-public abstract class AbstractCrudService<E, ID extends Serializable, M> implements Serializable {
+public abstract class AbstractCrudService<E, ID extends Serializable, M, F> implements Serializable {
 
     private String messageNotFound = "error.entity.not.found";
 
@@ -16,21 +18,30 @@ public abstract class AbstractCrudService<E, ID extends Serializable, M> impleme
     protected final AbstractMapper<E, M> mapper;
     protected final AbstractCrudValidation<E, ID> validation;
     protected final MessageService messageService;
+    protected final AbstractsSpecification<E> specification;
 
-    protected AbstractCrudService(AbstractJpaRepository<E, ID> repository, AbstractMapper<E, M> mapper, AbstractCrudValidation<E, ID> validation, MessageService messageService) {
+    protected AbstractCrudService(AbstractJpaRepository<E, ID> repository, AbstractMapper<E, M> mapper, AbstractCrudValidation<E, ID> validation, MessageService messageService, AbstractsSpecification<E> specification) {
         this.repository = repository;
         this.mapper = mapper;
         this.validation = validation;
         this.messageService = messageService;
+        this.specification = specification;
     }
 
-    protected AbstractCrudService(AbstractJpaRepository<E, ID> repository, AbstractMapper<E, M> mapper, MessageService messageService) {
-        this(repository, mapper, null, messageService);
+    protected AbstractCrudService(AbstractJpaRepository<E, ID> repository, AbstractMapper<E, M> mapper, MessageService messageService, AbstractsSpecification<E> specification) {
+        this(repository, mapper, null, messageService, specification);
     }
 
     @Transactional(readOnly = true)
     public Page<M> findAll(Pageable pageable) {
         var page = repository.findAll(pageable);
+        return mapper.toModels(page);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<M> findAll(Pageable pageable, F filter) {
+        var criteria = SearchCriteriaUtil.buildCriteria(filter);
+        var page = this.repository.findAll(specification.listAllByCriteria(criteria), pageable);
         return mapper.toModels(page);
     }
 
@@ -41,8 +52,9 @@ public abstract class AbstractCrudService<E, ID extends Serializable, M> impleme
             validation.checkOwnerFieldsToCreate(entity);
             validation.checkMandatoryFields(entity);
             validation.checkRelations(entity);
+            validation.checkValidationsExtras(entity);
         }
-        repository.save(entity);
+        repository.save(entity);    
         return mapper.toModel(entity);
     }
 
@@ -53,6 +65,7 @@ public abstract class AbstractCrudService<E, ID extends Serializable, M> impleme
             entity = validation.checkUpdateConsistence(id, entity);
             validation.checkMandatoryFields(entity);
             validation.checkRelations(entity);
+            validation.checkValidationsExtras(entity);
         }
         repository.save(entity);
         return mapper.toModel(entity);

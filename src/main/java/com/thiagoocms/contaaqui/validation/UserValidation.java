@@ -3,6 +3,7 @@ package com.thiagoocms.contaaqui.validation;
 import com.thiagoocms.contaaqui.common.AbstractCrudValidation;
 import com.thiagoocms.contaaqui.contaaqui_core.domain.user.User;
 import com.thiagoocms.contaaqui.contaaqui_core.exception.BadRequestException;
+import com.thiagoocms.contaaqui.contaaqui_core.exception.ConflictException;
 import com.thiagoocms.contaaqui.mapper.UserMapper;
 import com.thiagoocms.contaaqui.contaaqui_core.repository.UserRepository;
 import com.thiagoocms.contaaqui.common.MessageService;
@@ -17,6 +18,7 @@ public class UserValidation extends AbstractCrudValidation<User, Long> {
 
     private final UserMapper mapper;
     private final PasswordEncoder passwordEncoder;
+    private final UserRepository repository;
 
     @Autowired
     public UserValidation(UserMapper mapper, UserRepository repository, MessageService messageService, PasswordEncoder passwordEncoder) {
@@ -24,6 +26,7 @@ public class UserValidation extends AbstractCrudValidation<User, Long> {
         setMessageNotFound("error.user.not.found");
         this.mapper = mapper;
         this.passwordEncoder = passwordEncoder;
+        this.repository = repository;
     }
 
     @Override
@@ -48,5 +51,13 @@ public class UserValidation extends AbstractCrudValidation<User, Long> {
         mapper.merge(toUpdateEntity, persistedEntity);
 
         return persistedEntity;
+    }
+
+    @Override
+    protected void checkValidationsExtras(User entity) {
+        var count = repository.countByLoginAndDeletedIsFalse(entity.getId(), entity.getLogin());
+        if (count > 0) {
+            throw new ConflictException(messageService.getMessage("error.user.login.already.exists"));
+        }
     }
 }
